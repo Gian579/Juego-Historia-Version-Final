@@ -14,17 +14,13 @@ pygame.mixer.init()
 pantalla = pygame.display.set_mode((ANCHO, ALTO))
 pygame.display.set_caption("Historia del Perú RPG")
 
-# fuente(cambiala por la de rojo fuego)
+# fuente
 
 fuente = pygame.font.SysFont("arial", 24)
 
 # musica pokemon
 
-pygame.mixer.music.load("sonidos/musica.wav")
-pygame.mixer.music.set_volume(0.3)
-#si fuera 0 reproduce solo una vez 
-#si es 1 dos veces y asi
-pygame.mixer.music.play(-1)
+
 
 # efectos de sonido meme
 
@@ -32,6 +28,26 @@ correcto_sound = pygame.mixer.Sound("sonidos/correcto.wav")
 incorrecto_sound = pygame.mixer.Sound("sonidos/incorrecto.wav")
 victoria_sound = pygame.mixer.Sound("sonidos/victoria.wav")
 derrota_sound = pygame.mixer.Sound("sonidos/derrota.wav")
+
+correcto_img = pygame.image.load(
+    "sprites_ui/correcto.png"
+).convert_alpha()
+print(correcto_img.get_size())
+
+incorrecto_img = pygame.image.load(
+    "sprites_ui/incorrecto.png"
+).convert_alpha()
+print(incorrecto_img.get_size())
+
+correcto_img = pygame.transform.scale(
+    correcto_img,
+    (48,48)
+)
+
+incorrecto_img = pygame.transform.scale(
+    incorrecto_img,
+    (48,48)
+)
 
 # fondo
 
@@ -382,6 +398,20 @@ def batalla(nivel):
     sprite_profesor = profesor_normal
     sprite_estudiante = estudiante_normal
 
+    feedback_activo = False
+
+    feedback_imagen = None
+
+    feedback_x = 0
+    feedback_y = 0
+
+    feedback_inicio = 0
+
+    feedback_duracion = 800
+
+    boton_feedback = None
+    color_feedback = None
+    
     while True:
 
         tiempo_actual = pygame.time.get_ticks()
@@ -444,6 +474,40 @@ def batalla(nivel):
             opciones_mezcladas
         )
 
+        if feedback_activo:
+
+            pygame.draw.rect(
+                pantalla,
+                color_feedback,
+                boton_feedback
+            )
+
+            pygame.draw.rect(
+                pantalla,
+                BLANCO,
+                boton_feedback,
+                3
+            )
+
+            tiempo_feedback = (
+                pygame.time.get_ticks()
+                - feedback_inicio
+            )
+
+            if tiempo_feedback < feedback_duracion:
+
+                pantalla.blit(
+                    feedback_imagen,
+                    (
+                        feedback_x,
+                        feedback_y - tiempo_feedback // 15
+                    )
+                )
+
+            else:
+
+                feedback_activo = False
+
         pygame.display.update()
 
         if segundos_restantes <= 0:
@@ -495,6 +559,32 @@ def batalla(nivel):
 
                             correcto_sound.play()
 
+                            feedback_imagen = correcto_img
+
+                            feedback_x = boton.right + 15
+                            feedback_y = boton.centery - 24
+
+                            feedback_inicio = pygame.time.get_ticks()
+
+                            feedback_activo = True
+
+                            boton_feedback = boton
+                            color_feedback = VERDE
+
+                            pantalla.blit(
+                                correcto_img,
+                                (
+                                    boton.right + 20,
+                                    boton.centery - 24
+                                )
+                            )
+
+
+                            pygame.display.update()
+                            pygame.time.delay(600)
+
+
+
                             vida_profesor -= 10
 
                             sprite_profesor = profesor_damage
@@ -506,11 +596,37 @@ def batalla(nivel):
 
                             sprite_profesor = profesor_normal
 
+
+
                         # incorrectou
 
                         else:
 
                             incorrecto_sound.play()
+
+                            feedback_imagen = incorrecto_img
+
+                            feedback_x = boton.right + 15
+                            feedback_y = boton.centery - 24
+
+                            feedback_inicio = pygame.time.get_ticks()
+
+                            feedback_activo = True
+
+                            boton_feedback = boton
+                            color_feedback = ROJO
+                            pantalla.blit(
+                                incorrecto_img,
+                                (
+                                    boton.right + 20,
+                                    boton.centery - 24
+                                )
+                            )
+
+
+                            pygame.display.update()
+                            pygame.time.delay(600)
+
 
                             vida_estudiante -= 10
 

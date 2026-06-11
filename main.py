@@ -1,25 +1,32 @@
-import pygame
+from menu import mostrar_menu
+from batalla import batalla
+from configuracion import musica_batalla
 from batalla import batalla
 from batalla import pantalla_victoria
 from batalla import pantalla_derrota
 from batalla import pantalla_final
 
-pygame.init()
+while True:
 
-for nivel in [1,2,3]:
+    opcion = mostrar_menu()
 
-    ganado = batalla(nivel)
+    if opcion == "modo":
 
-    if ganado:
+        musica_batalla()
 
-        if nivel < 3:
-            pantalla_victoria(nivel)
+        for nivel in [1,2,3]:
 
-        else:
-            pantalla_final()
+            ganado = batalla(nivel)
 
-    else:
+            if ganado:
 
-        pantalla_derrota(nivel)
+                if nivel < 3:
+                    pantalla_victoria(nivel)
 
-pygame.quit()
+                else:
+                    pantalla_final()
+
+            else:
+
+                pantalla_derrota(nivel)
+                break
